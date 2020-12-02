@@ -1,6 +1,6 @@
 import random
 
-choice = [2,3,4,5,6,7,8,9,'J','Q','K','A']
+choice = [2,3,4,5,6,7,8,9,10,'J','Q','K','A']
 deck = list()
 for c in choice:
     for i in range(4):

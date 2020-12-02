@@ -1,42 +1,50 @@
-''' Calculating total permutations. '''
-cards = [2,3,4,5,6,7,8,9,'J','Q','K','A']
-
+import random
 from collections import defaultdict
-total_count = defaultdict(lambda: 0)
 
-def permutate(current_score, score_list):
-    if current_score >= target_score:
-        # Checking for bust, if we bust but we have an ace we reduce the ace to a 1 and continue
-        if 'A' in score_list:
-            a_index = score_list.index('A')
-            score_list[a_index] = 1
-            current_score -= 10
+cards = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
 
-        if current_score >= target_score:
-            total_count[current_score] += 1
-            #print(score_list, current_score)
-            return
+class Deck:
 
-    else:
-        # Performing permutate with all available cards
-        for c in cards:
-            new_score_list = score_list.copy()
-            new_score_list.append(c)
-            if type(c) == int:
-                permutate(current_score + c, new_score_list)
-            else:
-                if c == 'J' or c == 'Q' or c == 'K':
-                    permutate(current_score + 10, new_score_list)
+    def __init__(self, size: int):
+        self.cards = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
+        self.values = [2,3,4,5,6,7,8,9,10,10,10,10,11]
+        self.size = size
 
-                elif c == 'A':
-                    permutate(current_score + 11, new_score_list)
+        # Keeping track of the total number of drawn cards
+        self.totalDrawn = 0
+        self.drawnMap = defaultdict(lambda: 0)
 
-target_scores = [14,15,16,17,18,19,20,21]
-for t in target_scores:
-    target_score = t
-    total_count = defaultdict(lambda: 0)
-    permutate(0, list())
-    print("")
-    for k in sorted(total_count.keys()):
-        print(k,',',total_count[k])
-    print('')
+        # Building the deck
+        self.deck = list()
+        for card in self.cards:
+            for i in range(4 * size):
+                self.deck.append(card)
+
+    def draw(self):
+        card_index = random.randint(0, len(self.deck))
+        self.totalDrawn += 1
+        card = self.deck[card_index]
+        self.drawnMap[card] += 1
+        return self.deck.pop(card_index)
+
+    def count_prob(self, cardType):
+        # Calculating the probability of drawing this card type
+        totalCards = (self.size * 4)
+        totalCards -= self.drawnMap[cardType]
+
+        return totalCards / (len(self.deck))
+
+    def expectedDrawValue(self):
+        o = 0
+        for i in range(len(self.cards)):
+            o += (self.count_prob(self.cards[i]) * self.values[i])
+        return o
+
+d = Deck(1)
+print(d.expectedDrawValue())
+for c in cards:
+    print(d.count_prob(c))
+print(d.draw())
+for c in cards:
+    print(d.count_prob(c))
+print(d.expectedDrawValue())
